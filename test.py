@@ -218,6 +218,6 @@ while running:
     pygame.display.update()
 
 pygame.time.delay(2000)
-pygame.quit()
+#pygame.quit()
 
 # https://www.youtube.com/watch?v=QU1pPzEGrqw
