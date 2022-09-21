@@ -3,11 +3,10 @@
 # 규칙2. 처음 만나는 . 이후 부분은 제외 
 # 규칙3. 남은 글자 중 처음 세자리 + 글자갯수 + 글자 내 "e" 개수 + "!" 로 비밀번호를 구성
 
-Url = "http://youtube.com"
 
-Seq = Url.replace("http://", "") # http:// 제외 = 규칙1
-Seq[:Seq.find(".")] # 첫번째 . 앞에서 자르기
 
-password = Seq[:3] + str(len(Seq)) + str(Seq.count("e")) + "!"
-
-print("{0}의 비밀번호는 {1}입니다.".format(Url, password))
+url = "http://youtube.com"
+password = url.replace("http://", "")
+password = password[:password.find(".")]
+password = password[:3]+str(len(password))+str(password.count("e"))+"!"
+print(password)
