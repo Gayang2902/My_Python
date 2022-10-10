@@ -46,8 +46,20 @@ character = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Game/game image/
 character_size = character.get_rect().size  
 character_width = character_size[0]
 character_height = character_size[1]
-character_x_pos = (screen_width / 2) + (character_width / 2)
+character_x_pos = (screen_width / 2) - (character_width / 2)
 character_y_pos = screen_height - stage_height - character_height
+
+character_to_x = 0
+
+character_speed = 5
+
+weapon = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Game/game image/weapon.png")
+weapon_size = weapon.get_rect().size    
+weapon_width = weapon_size[0]   
+
+weapons = []
+
+weapon_speed = 10
 
 running = True
 while running:
@@ -56,10 +68,39 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    
-    screen.blit(stage, (0, screen_height - stage_height))
+            
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                character_to_x -= character_speed
+            elif event.key == pygame.K_RIGHT:
+                character_to_x += character_speed
+            elif event.key == pygame.K_SPACE:
+                weapon_x_pos = character_x_pos + (character_width / 2) - (weapon_width / 2)
+                weapon_y_pos = character_y_pos
+                weapons.append([weapon_x_pos, weapon_y_pos])
+            
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                character_to_x = 0
+        
+    character_x_pos += character_to_x
+        
+    if character_x_pos < 0:
+        character_x_pos = 0
+    elif character_x_pos > screen_width - character_width:
+        character_x_pos = screen_width - character_width
+        
+    # weapons = [[w[0], w[1] - weapon_speed] for w in weapons] # 한 줄 for문은 이런식으로
+    for w in weapons: # 정석 for문은 이런식으로
+        w[1] = w[1] - weapon_speed
+        
+    weapons = [[w[0], w[1]] for w in weapons if w[1] > 0]
+            
     screen.blit(background, (0, 0))
-    screen.blit(character, (character_x_pos, character_y_pos))
+    for weapon_x_pos, weapon_y_pos in weapons:
+        screen.blit(weapon, (weapon_x_pos, weapon_y_pos))
+    screen.blit(character, (character_x_pos, character_y_pos))        
+    screen.blit(stage, (0, screen_height - stage_height))
     
     pygame.display.update()
     
