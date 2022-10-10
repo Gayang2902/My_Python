@@ -5,4 +5,15 @@
 import random
 
 guests = []
-guests.insert(i, (int((random.random() * 10) + 1))) for i in range(0, 50)    
+count = 0
+for i in range(0, 50):
+    guests.append(random.randint(5, 50))
+
+for i in range(0, 50):
+    if 5 <= guests[i] <= 15:
+        print("[O] {} guest (time : {}m".format(i+1, guests[i]))
+        count += 1
+    else:
+        print("[] {} guest (time : {}m".format(i+1, guests[i]))
+        
+print(count)
