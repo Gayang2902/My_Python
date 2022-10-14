@@ -33,33 +33,53 @@ clock = pygame.time.Clock()
 current_path = os.path.dirname(__file__) # 현재 파일 위치 반환
 image_path = os.path.join(current_path, "game image")
 
-# background = pygame.image.load(os.path.join(image_path, "background.png"))
-background = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Game/game image/background.png")
+background = pygame.image.load(os.path.join(image_path, "background.png"))
+#background = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Pygame/game image/background.png")
 
 # stage = pygame.image.load(os.path.join(image_path, "stage.png"))
-stage = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Game/game image/stage.png")
+stage = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Pygame/game image/stage.png")
 stage_size = stage.get_rect().size
 stage_height = stage_size[1] # stage 위에 character를 세워놓기 위해 계산을 통한 변수생성
 
 # character = pygame.image.load(os.path.join(image_path), "character.png")
-character = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Game/game image/character.png")
+character = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Pygame/game image/character.png")
 character_size = character.get_rect().size  
 character_width = character_size[0]
 character_height = character_size[1]
 character_x_pos = (screen_width / 2) - (character_width / 2)
-character_y_pos = screen_height - stage_height - character_height
+character_y_pos = screenn_height - stage_height - character_height
 
 character_to_x = 0
 
 character_speed = 5
 
-weapon = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Game/game image/weapon.png")
+weapon = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Pygame/game image/weapon.png")
 weapon_size = weapon.get_rect().size    
 weapon_width = weapon_size[0]   
 
 weapons = []
 
 weapon_speed = 10
+
+ball_images = [
+    pygame.image.load(os.path.join(image_path, "ballon1.png")),
+    pygame.image.load(os.path.join(image_path, "ballon2.png")),
+    pygame.image.load(os.path.join(image_path, "ballon3.png")),
+    pygame.image.load(os.path.join(image_path, "ballon4.png"))]
+
+# 공 크기에 따른 최초 스피드
+ball_speed_y = [-18, -15, -12, -9]
+
+balls = []
+
+
+# 공은 여러개가 존재하고 각각 좌우상하 움직임이 다르기 때문에 dictionary를 이용해 세분화 시켜준다. 
+balls.apeend({
+    "pos_x" : 50,
+    "pos_y" : 50,
+    "image_index" : 0,
+    
+})
 
 running = True
 while running:
@@ -76,6 +96,7 @@ while running:
                 character_to_x += character_speed
             elif event.key == pygame.K_SPACE:
                 weapon_x_pos = character_x_pos + (character_width / 2) - (weapon_width / 2)
+                #weapon_y_pos = screen_height - stage_height - character_height
                 weapon_y_pos = character_y_pos
                 weapons.append([weapon_x_pos, weapon_y_pos])
             
@@ -94,6 +115,7 @@ while running:
     for w in weapons: # 정석 for문은 이런식으로
         w[1] = w[1] - weapon_speed
         
+    # 천장에 닿지 않은 weapon들만 리스트에 재저장핢으로써 천장에 닿은 weapon은 리스트에 들어가지 않기에 더는 그려지지 않는다.
     weapons = [[w[0], w[1]] for w in weapons if w[1] > 0]
             
     screen.blit(background, (0, 0))
