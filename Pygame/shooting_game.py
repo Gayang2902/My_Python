@@ -81,8 +81,8 @@ balls.append({
     "to_y" : -6,
     "init_speed_y" : ball_speed_y[0]})
 
-# 사라질 무기와 공(무기와 공이 닿으면 무기는 사라지고, 공은 사라진뒤 해당 자리에 작은 공이 생김)
-weapon_to_remove = -1
+# 사라질 무기와 공이 가지게 될 index(무기와 공이 닿으면 무기는 사라지고, 공은 사라진뒤 해당 자리에 작은 공이 생김)
+ball_to_remove = -1
 weapon_to_remove = -1
 
 running = True
@@ -165,18 +165,42 @@ while running:
             weapon_pos_x = weapon_value[0]
             weapon_pos_y = weapon_value[1]
             
-            weapon_rect = weapon.get_rect
+            weapon_rect = weapon.get_rect()
             weapon_rect.left = weapon_pos_x
             weapon_rect.top = weapon_pos_y
             
             if weapon_rect.colliderect(ball_rect):
                 weapon_to_remove = weapon_index
                 ball_to_remove = ball_index
+                
+                # 가장 작은 공이 아닐 경우, 다음 단계의 공으로 나눠지는 처라
+                if ball_index < 3:
+                    # 현재 공의 크기 정보
+                    ball_width = ball_rect.size[0]
+                    ball_height = ball_rect.size[1
+                                                 
+                    # 나눠진 공 정보
+                    small_ball_rect = ball_images[ball_image_index + 1].get_rect
+                    
+                    # 왼쪽으로 나눠지는 공 // 2:23:53
+                    balls.append({
+                        "pos_x" : 50,
+                        "pos_y" : 50,
+                        "image_index" : ball_value["image_index"] + 1,
+                        "to_x" : -3,
+                        "to_y" : -6,
+                        "inint_speed_y" : ball_speed_y[0]})
+                    
                 break
             
     # 충돌된 공 or 무기 없애기 
     if ball_to_remove > -1:
-        del balls([ball_to_remove]) # 10/15 2:47 am
+        del balls[ball_to_remove]
+        ball_to_remove = -1
+        
+    if weapon_to_remove > -1:
+        del weapons[weapon_to_remove]
+        weapon_to_remove = -1
             
     screen.blit(background, (0, 0))
     for weapon_x_pos, weapon_y_pos in weapons:
