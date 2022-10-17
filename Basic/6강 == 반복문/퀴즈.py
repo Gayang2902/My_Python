@@ -14,11 +14,3 @@ for guest in range(1, 51):
         print("[] {0}번째 손님 (소요시간 : {1}분)".format(guest, time))
 
 print("총 탑승 승객 : {} 분".format(final_guest))
-    
-    
-    
-
-
-
-
-

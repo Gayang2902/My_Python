@@ -23,10 +23,19 @@ print(subway)
 subway.insert(1, "정형돈") #insert는 리스트 중간에 위치를 지정해서 객체를 삽입
 print(subway)
 
-#리스트에 있는 객체를 하나씩 꺼냄 - pop() 을 아용함
+# 값 삭제
+
+#리스트에 있는 객체를 하나씩 꺼냄 - pop() 을 아용함 / 기본적으로는 리스트의 맨 마지막 인덱스 삭제 ()안에 인덱스 번호 지정 가능
 #print(subway.pop()) # 꺼내진 객체 출력
 subway.pop()
 print(subway) # 객체가 꺼내진 이후에 리스트 출력
+
+# del 키워드
+# del list_list[index] / []안에 슬라이싱을 사용해서 여러 개의 값을 삭제 가능
+
+# remove 함수 / 값이 x와 같은 첫 번째 요소 제거
+# 만약 리스트안에 같은 요소가 두 가지 이상 있다면 그 중 첫번째 값을 제거함
+# list_list.remove(x) 
 
 print(subway.pop())
 # print(subway)
