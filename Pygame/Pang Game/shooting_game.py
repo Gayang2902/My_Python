@@ -17,8 +17,8 @@
 # 4. 무기 : 20 * 430
 # 5. 공 : 160 * 160, 80 * 80, 40 * 40, 20 * 20
 
-import pygame
 import os
+import pygame
 
 pygame.init()
 
@@ -36,13 +36,13 @@ image_path = os.path.join(current_path, "game image")
 background = pygame.image.load(os.path.join(image_path, "background.png"))
 #background = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Pygame/game image/background.png")
 
-# stage = pygame.image.load(os.path.join(image_path, "stage.png"))
-stage = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Pygame/game image/stage.png")
+stage = pygame.image.load(os.path.join(image_path, "stage.png"))
+# stage = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Pygame/game image/stage.png")
 stage_size = stage.get_rect().size
 stage_height = stage_size[1] # stage 위에 character를 세워놓기 위해 계산을 통한 변수생성
 
-# character = pygame.image.load(os.path.join(image_path), "character.png")
-character = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Pygame/game image/character.png")
+character = pygame.image.load(os.path.join(image_path, "character.png"))
+# character = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Pygame/game image/character.png")
 character_size = character.get_rect().size  
 character_width = character_size[0]
 character_height = character_size[1]
@@ -53,7 +53,8 @@ character_to_x = 0
 
 character_speed = 5
 
-weapon = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Pygame/game image/weapon.png")
+weapon = pygame.image.load(os.path.join(image_path, "weapon.png"))
+# weapon = pygame.image.load("/Users/kd_mb/Desktop/code/Python/Pygame/game image/weapon.png")
 weapon_size = weapon.get_rect().size    
 weapon_width = weapon_size[0]   
 
@@ -116,19 +117,19 @@ while running:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 character_to_x = 0
         
-    character_x_pos += character_to_x
+    character_x_pos += character_to_x 
         
     if character_x_pos < 0:
         character_x_pos = 0
     elif character_x_pos > screen_width - character_width:
         character_x_pos = screen_width - character_width
         
-    # weapons = [[w[0], w[1] - weapon_speed] for w in weapons] # 한 줄 for문은 이런식으로
-    for w in weapons: # 정석 for문은 이런식으로
-        w[1] = w[1] - weapon_speed
+    weapons = [[w[0], w[1] - weapon_speed] for w in weapons]
+    #for w in weapons: # 정석 for문은 이런식으로
+        #w[1] = w[1] - weapon_speed
         
     # 천장에 닿지 않은 weapon들만 리스트에 재저장핢으로써 천장에 닿은 weapon은 리스트에 들어가지 않기에 더는 그려지지 않는다.
-    weapons = [[w[0], w[1]] for w in weapons if w[1] > 0]
+    weapons = [ [w[0], w[1]] for w in weapons if w[1] > 0]
     
     # 공 위치 정의
     for ball_index, ball_value in enumerate(balls):
@@ -140,8 +141,8 @@ while running:
         ball_width = ball_size[0]
         ball_height = ball_size[1]
         
-        if ball_pos_x <= 0 or ball_pos_x >= screen_width - ball_width:
-            ball_value["to_x"] *= -1
+        if ball_pos_x < 0 or ball_pos_x > screen_width - ball_width:
+            ball_value["to_x"] = ball_value["to_x"] * -1
             
         if ball_pos_y >= screen_height - stage_height - ball_height:
             ball_value["to_y"] = ball_value["init_speed_y"]
@@ -182,7 +183,7 @@ while running:
                 ball_to_remove = ball_index
                 
                 # 가장 작은 공이 아닐 경우, 다음 단계의 공으로 나눠지는 처리
-                if ball_index < 3:
+                if ball_image_index < 3:
                     # 현재 공의 크기 정보
                     ball_width = ball_rect.size[0]
                     ball_height = ball_rect.size[1]
@@ -191,27 +192,27 @@ while running:
                     small_ball_rect = ball_images[ball_image_index + 1].get_rect()
                     small_ball_width = small_ball_rect.size[0]
                     small_ball_height = small_ball_rect.size[1]
-                    
+            
                     # 왼쪽으로 나눠지는 공
                     balls.append({
-                        "pos_x" : ball_pos_x + (ball_width / 2) - (small_ball_width / 2) ,
-                        "pos_y" : ball_pos_y + (ball_height + 2) - (small_ball_height / 2),
+                        "pos_x" : ball_pos_x + (ball_width / 2) - (small_ball_width / 2),
+                        "pos_y" : ball_pos_y + (ball_height / 2) - (small_ball_height / 2),
                         "image_index" : ball_image_index + 1,
                         "to_x" : -3,
                         "to_y" : -6,
                         "init_speed_y" : ball_speed_y[ball_image_index + 1]})
                     
                     balls.append({
-                        "pos_x" : ball_pos_x + (ball_width / 2) - (small_ball_width / 2) ,
-                        "pos_y" : ball_pos_y + (ball_height + 2) - (small_ball_height / 2),
+                        "pos_x" : ball_pos_x + (ball_width / 2) - (small_ball_width / 2),
+                        "pos_y" : ball_pos_y + (ball_height / 2) - (small_ball_height / 2),
                         "image_index" : ball_image_index + 1,
                         "to_x" : 3,
                         "to_y" : -6,
                         "init_speed_y" : ball_speed_y[ball_image_index + 1]})
                     
                 break
-            else:
-                continue
+        else:
+            continue
         break
             
     # 충돌된 공 or 무기 없애기 
