@@ -17,7 +17,7 @@ class Claw(pygame.sprite.Sprite):
         self.angle_speed = 2.5 # 집게의 각도 변경 폭 (좌우 이동 속도)
         self.angle = 10 # 최초 각도는 10도 (오른쪽 끝)
         
-    def update(self, to_x): # sprite class가 제공하는 method로 sprite의 움직임을 도와주는 함수이다.(캐릭터가 숨쉬는 듯한 모션 구현에 사용)
+    def update(self): # sprite class가 제공하는 method로 sprite의 움직임을 도와주는 함수이다.(캐릭터가 숨쉬는 듯한 모션 구현에 사용)
         if self.direction == LEFT: # 왼쪽 방향으로 이동하고 있다면
             self.angle += self.angle_speed # 이동 속도만큼 각도 증가
         elif self.direction == RIGHT: # 오른쪽 방향으로 이동하고 있다면
@@ -26,13 +26,11 @@ class Claw(pygame.sprite.Sprite):
         # 만약에 허용 각도 범위를 벗어나면
         if self.angle > 170:
             self.angle = 170
-            self.set_direction(RIGHT)
+            self.direction = RIGHT
         elif self.angle < 10:
             self.angle = 10
-            self.set_direction(LEFT)
-            
-        # offset에서 x만 넣었음에도 각도에 따른 x, y좌표를 rotate method에서 처리해주기 때문에 발사해서 좌표가 변할때도 x만 변화를 주어도 된다.
-        self.offset.x += to_x
+            self.direction = LEFT
+        
         self.rotate() # 회전 처리
             
         # print(self.angle, self.direction) 잘 작동하는지 테스트
@@ -58,49 +56,31 @@ class Claw(pygame.sprite.Sprite):
         # print(self.rect)
         pygame.draw.rect(screen, RED, self.rect, 1)
         
-    def set_direction(self, direction):
-        self.direction = direction
-        
     def draw(self, screen):
         screen.blit(self.image, self.rect)
         pygame.draw.circle(screen, RED, self.position, 3) # 중심점 표시
         # 중심점으로부터 집게까지의 직선을 그려줌
         pygame.draw.line(screen, BLACK, self.position, self.rect.center,  5) # line 함수를 통해 직선그리기, (어디에 그릴건지, 무슨색인지, 어디서부터, 어디까지, 두께)
-        
-    def set_init_state(self):
-        self.offset.x = default_offset_x_claw
-        self.angle = 10
-        self.direction = LEFT
 
 # 보석 클래스
 class Gemstone(pygame.sprite.Sprite): # pygame의 sprite class를 상속받음
-    def __init__(self, image, position, price, speed):
+    def __init__(self, image, position):
         super().__init__() # sprite class의 초기화
-        # sprite class를 상속받아서 사용하기 위해서는 반드시 2개의 member variable이 필요하다. (이미지와 좌표(rect)정보)
+        # sprite class를 상속받아서 사용하기 위해서는 반드시 2개의 member variable이 필요하다.
         self.image = image
         # 초기 위치가 보석마다 다 다르기 때문에 instance 생성 시 position을 받아오고, 그 값을 rect값의 center에 넣어준다.
         self.rect = image.get_rect(center = position)
-        self.price = price
-        self.speed = speed
-        
-    def set_position(self, position, angle):
-        
 
 def setup_gemstone(): # 게임에 원하는 만큼의 보석을 정의
-    small_gold_price, small_gold_speed = 100, 5
-    big_gold_price, big_gold_speed = 300, 2
-    stone_price, stone_speed = 10, 2
-    diamond_price, diamond_speed = 600, 7
-    
     # 작은 금
-    small_gold = Gemstone(gemstone_images[0], (200, 380), small_gold_price, small_gold_speed)
+    small_gold = Gemstone(gemstone_images[0], (200, 380))
     gemstone_group.add(small_gold) # 그룹에 추가
     # 큰 금 (여기서부턴 보석정의와 그룹추가를 한줄에 진행)
-    gemstone_group.add(Gemstone(gemstone_images[1], (300, 500), big_gold_price, big_gold_speed))
+    gemstone_group.add(Gemstone(gemstone_images[1], (300, 500)))
     # 돌
-    gemstone_group.add(Gemstone(gemstone_images[2], (300, 380), stone_price, stone_speed))
+    gemstone_group.add(Gemstone(gemstone_images[2], (300, 380)))
     # 다이아몬드
-    gemstone_group.add(Gemstone(gemstone_images[3], (900, 380), diamond_price, diamond_speed))
+    gemstone_group.add(Gemstone(gemstone_images[3], (900, 380)))
 
 pygame.init()
 screen_width = 1280
@@ -112,16 +92,7 @@ clock = pygame.time.Clock()
 
 # 게임 관련 변수
 default_offset_x_claw = 40 # 중심점으로부터 집게까지의 기본 x 간격
-to_x = 0 # x 좌표 기준으로 집게 이미지를 이동시킬 값 저장 변수
-caught_gemstone = None # 집게를 뻗어서 잡은 보석 정보
-
-# 속도 변수
-move_speed = 12 # 발사할 때 이동 스피드 (x 좌표 기준 증가되는 값)
-return_speed = 20 
-
-# 방향 변수
 LEFT = -1 # 왼쪽 방향
-STOP = 0 # 방향이 멈출때, 방향이 없으니 0으로 정의
 RIGHT = 1 # 오른쪽 방향
 
 # 색깔 변수
@@ -154,37 +125,11 @@ while(running):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            claw.set_direction(STOP) # 좌우 멈춤
-            to_x = move_speed # move_speed만큼 빠르게 쭉 뻗음
-            
-    if claw.rect.left < 0 or claw.rect.right > screen_width or claw.rect.bottom > screen_height:
-        to_x = -return_speed
-        
-    if claw.offset.x < default_offset_x_claw : # 원위치에 오면
-        to_x = 0
-        claw.set_init_state() # 처음 상태로 되돌림
-        
-        if caught_gemstone:
-            # update_score(caught_gemstone.price) # 점수 업데이트 처리
-            gemstone_group.remove(caught_gemstone) # 그룹에서 잡힌 보석 제외
-            caught_gemstone = None
-        
-    if not caught_gemstone: # 잡힌 보석이 없다면 충돌 체크
-        for gemstone in gemstone_group:
-            if claw.rect.colliderect(gemstone.rect):
-                caught_gemstone = gemstone
-                to_x = -gemstone.speed
-                break
-            
-    if caught_gemstone:
-        caught_gemstone.set_position(claw.rect.center, claw.angle)
     
     screen.blit(background, (0, 0))
     
     gemstone_group.draw(screen) # 그룹에 있는 모든 sprite들을 screen에 그려줌 (draw함수는 group class에서만 사용가능)
-    claw.update(to_x)
+    claw.update()
     claw.draw(screen) # claw는 group이 아니기 때문에 draw method가 없다. 따라서 Claw class에서 draw method를 정의해줬다.
     
     pygame.display.update()
