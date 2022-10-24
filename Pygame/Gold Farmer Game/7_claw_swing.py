@@ -6,14 +6,55 @@ class Claw(pygame.sprite.Sprite):
     def __init__(self, image, position):
         super().__init__()
         self.image = image
+        self.original_image = image
         self.rect = image.get_rect(center = position) # center를 통해 해당 좌표를 rect의 중간값으로 정의할 수 있다.
         
         self.offset = pygame.math.Vector2(default_offset_x_claw, 0) # x위치를 100만큼 오른쪽으로 이동
         self.position = position
         
+        # 집게의 회전구현 (10도에서 170도까지만 게임상에서 움직이도록 할 예정)
+        self.direction = LEFT # 집게의 이동방향
+        self.angle_speed = 2.5 # 집게의 각도 변경 폭 (좌우 이동 속도)
+        self.angle = 10 # 최초 각도는 10도 (오른쪽 끝)
+        
     def update(self): # sprite class가 제공하는 method로 sprite의 움직임을 도와주는 함수이다.(캐릭터가 숨쉬는 듯한 모션 구현에 사용)
-        rect_center = self.position + self.offset # 원래의 position에 offset만큼 더해져서 center값이 정해진다.
-        self.rect = self.image.get_rect(center = rect_center)
+        if self.direction == LEFT: # 왼쪽 방향으로 이동하고 있다면
+            self.angle += self.angle_speed # 이동 속도만큼 각도 증가
+        elif self.direction == RIGHT: # 오른쪽 방향으로 이동하고 있다면
+            self.angle -= self.angle_speed
+            
+        # 만약에 허용 각도 범위를 벗어나면
+        if self.angle > 170:
+            self.angle = 170
+            self.direction = RIGHT
+        elif self.angle < 10:
+            self.angle = 10
+            self.direction = LEFT
+        
+        self.rotate() # 회전 처리
+            
+        # print(self.angle, self.direction) 잘 작동하는지 테스트
+        
+        # rect_center = self.position + self.offset # 원래의 position에 offset만큼 더해져서 center값이 정해진다.
+        # self.rect = self.image.get_rect(center = rect_center)
+        
+    def rotate(self):
+        # pygame.transform.rotate() 회전처리 함수는 두개지만 아래의 함수가 더 매끄럽다. 
+        # rotozoom method는 원래의 이미지를 가지고 새로운 이미지를 생성해내는 방식으로 이미지의 회전을 구현한다. 따라서 원본이미지의 변수를 위에서 만들어준다.
+        # 실제 각도는 반시계방향으로 커지기 때문에, 게임상에서 시계방향 각도 증가를 만들기 위해서는 각도에 -를 붙혀주어야 한다.
+        self.image = pygame.transform.rotozoom(self.original_image, -self.angle, 1) # (원본이미지, 각도, 이미지 크기(변경x = 1))
+        
+        # 각도의 회전만큼 띄어주는 중심점으로부터 띄워주는 거리(offset)도 계속 변화해야함
+        # Vector2 class에는 rotate라는 각에 따른 좌표변화를 자동으로 계산해주는 method가 제공된다.
+        offset_rotated = self.offset.rotate(self.angle)
+        
+        # 회전된 이미지가 새로 만들어질때마다 rect의 center값도 계속해서 달라지므로 rect도 새롭게 초기화를 계속 해주어야한다.
+        # 이 과정을 진행하지 않으면 rect정보는 최초의 것을 계속 사용하기 때문에 이미지의 회전이 올바르지 않게 된다.
+        # 중심점은 최초의 position을 계속 사용하되 이미지의 크기에 맞게 rect사이즈만 바꿔줌        
+        self.rect = self.image.get_rect(center = self.position + offset_rotated)
+        
+        # print(self.rect)
+        pygame.draw.rect(screen, RED, self.rect, 1)
         
     def draw(self, screen):
         screen.blit(self.image, self.rect)
@@ -51,6 +92,8 @@ clock = pygame.time.Clock()
 
 # 게임 관련 변수
 default_offset_x_claw = 40 # 중심점으로부터 집게까지의 기본 x 간격
+LEFT = -1 # 왼쪽 방향
+RIGHT = 1 # 오른쪽 방향
 
 # 색깔 변수
 RED = (255, 0, 0)
